@@ -5,7 +5,7 @@ const clearBtn = document.getElementById('clear');
 const filter = document.getElementById('filter')
 
 
-function addItem(e){
+function OnAddItemSubmit(e){
     e.preventDefault();
 
     const newItem = itemInput.value
@@ -16,12 +16,9 @@ function addItem(e){
         return;
 
     }
-    //Create list item
-    const li = document.createElement('li');
-    const button = createButton ("remove-item btn-link text-red")
-    li.appendChild(document.createTextNode(newItem))
-    li.appendChild(button)
-    itemList.appendChild(li)
+
+    addItemToDOM (newItem);
+
 
     checkUI();
 
@@ -29,6 +26,26 @@ function addItem(e){
 
         
 }
+
+function addItemToDOM (item) {
+
+        //Create list item
+    const li = document.createElement('li');
+    const button = createButton ("remove-item btn-link text-red");
+    li.appendChild(document.createTextNode(item));
+    li.appendChild(button);
+    itemList.appendChild(li);
+
+}
+
+// function addItemToStorage(item){
+//     let itemsFromStorage;
+//     if (localStorage.getItem('items') ===null) {
+//         itemsFromStorage = []
+//     } else {
+
+//     }
+// }
 
 
 function createButton (classes){
@@ -91,9 +108,31 @@ function checkUI(){
         filter.style.display = 'none';
     } 
     }
+
+function filterItems(e){
+    const items = itemList.querySelectorAll('li');
+    const text = e.target.value.toLowerCase();
+
+    items.forEach((item) => {
+        const itemName = item.innerText.toLocaleLowerCase();
+
+    if (itemName.indexOf(text) != -1){
+
+        item.style.display = 'flex';
+    } else {
+         item.style.display = 'none';
+    }
+
+    
+})
+}
+
+
+
 checkUI();
 
 //Event Listner
-itemForm.addEventListener('submit', addItem);
+itemForm.addEventListener('submit', OnAddItemSubmit);
 itemList.addEventListener('click', removeItem);
 clearBtn.addEventListener('click', clearItems);
+filter.addEventListener('input', filterItems)

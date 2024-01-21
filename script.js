@@ -73,6 +73,14 @@ function getItemsFromStrorage(item){
 }
 
 
+function onClickItem(e){
+    if (e.target.parentElement.classList.contains( "remove-item")){
+        removeItem(e.target.parentElement.parentElement);
+
+    }
+
+}
+
 function createButton (classes){
     const button = document.createElement('button');
     button.className = classes;
@@ -87,19 +95,40 @@ function createIcon(classes){
     return icon;
 }
 
-function removeItem(e){
+function removeItem(item){
+    if (confirm('Are you sure?')){
+    //Remove item from DOM
+    item.remove();
+
+    // Remove item from storage
+    removeItemFromStorage(item.textContent);
+
+    checkUI();
+    }
+
+    function removeItemFromStorage(item){
+        let itemsFromStorage = getItemsFromStrorage()
+
+        //Filter out item to be removed
+
+        itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+        //Re-set to localstorage
+        localStorage.setItem('items', JSON.stringify(itemsFromStorage))
+
+    }
 
    //const clearButton = document.getElementsByClassName("fa-solid fa-xmark")
 
-   if (e.target.parentElement.classList.contains( "remove-item")){
-    if (confirm('Are you sure?')){
-        e.target.parentElement.parentElement.remove();
-    }
+//    if (e.target.parentElement.classList.contains( "remove-item")){
+//     if (confirm('Are you sure?')){
+//         e.target.parentElement.parentElement.remove();
+//     }
     
 
-   }
+//    }
 
-   checkUI()
+//    checkUI()
     
 }
 
@@ -113,6 +142,9 @@ function clearItems(e){
     // e.target.remove();
     // itemList.remove();
     // filter.remove();
+
+    // Clear from localstoarge
+    localStorage.removeItem('items')
     checkUI()
 
 }
@@ -158,7 +190,7 @@ function init(){
     
 //Event Listner
 itemForm.addEventListener('submit', OnAddItemSubmit);
-itemList.addEventListener('click', removeItem);
+itemList.addEventListener('click', onClickItem);
 clearBtn.addEventListener('click', clearItems);
 filter.addEventListener('input', filterItems)
 document.addEventListener('DOMContentLoaded', displayItems);

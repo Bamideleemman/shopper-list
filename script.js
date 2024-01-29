@@ -3,6 +3,8 @@ const itemInput = document.getElementById('item-input');
 const itemList = document.getElementById('item-list');
 const clearBtn = document.getElementById('clear');
 const filter = document.getElementById('filter')
+let isEditMode = false
+const formBtn = itemForm.querySelector('button')
 
 
 function displayItems() {
@@ -23,6 +25,20 @@ function OnAddItemSubmit(e){
         return;
 
     }
+    //Check for edit mode
+    if (isEditMode){
+        const itemToEdit = itemList.querySelector('.edit-mode')
+        removeItemFromStorage(itemToEdit.textContent)
+        itemToEdit.classList.remove('edit-mode')
+        itemToEdit.remove()
+        isEditMode = false
+    }  else{
+        if(checkIfItemExists(newItem)){
+            alert(`${newItem} already exists!`)
+            return
+        }
+    }
+
 
     //Create item to DOM element
     addItemToDOM (newItem);
@@ -77,8 +93,27 @@ function onClickItem(e){
     if (e.target.parentElement.classList.contains( "remove-item")){
         removeItem(e.target.parentElement.parentElement);
 
+    } else {
+        setItemToEdit(e.target)
+      
     }
 
+}
+
+function checkIfItemExists(item){
+    const itemsFromStorage = getItemsFromStrorage();
+    return itemsFromStorage.includes(item)
+}
+
+function setItemToEdit(item){
+    isEditMode = true;
+
+    itemList.querySelectorAll('li').forEach((i) => i.classList.remove('edit-mode'))    
+    
+    item.classList.add('edit-mode')
+    formBtn.innerHTML = '<i class="fa-solid fa-pen"></i>Update Item'
+    formBtn.style.backgroundColor = '#228B22'
+    itemInput.value = item.textContent;
 }
 
 function createButton (classes){
@@ -106,17 +141,7 @@ function removeItem(item){
     checkUI();
     }
 
-    function removeItemFromStorage(item){
-        let itemsFromStorage = getItemsFromStrorage()
 
-        //Filter out item to be removed
-
-        itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
-
-        //Re-set to localstorage
-        localStorage.setItem('items', JSON.stringify(itemsFromStorage))
-
-    }
 
    //const clearButton = document.getElementsByClassName("fa-solid fa-xmark")
 
@@ -131,6 +156,18 @@ function removeItem(item){
 //    checkUI()
     
 }
+
+    function removeItemFromStorage(item){
+        let itemsFromStorage = getItemsFromStrorage()
+
+        //Filter out item to be removed
+
+        itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+        //Re-set to localstorage
+        localStorage.setItem('items', JSON.stringify(itemsFromStorage))
+
+    }
 
 function clearItems(e){
     if (confirm('Are you sure?')){
@@ -151,6 +188,7 @@ function clearItems(e){
 
 
 function checkUI(){
+    itemInput.value = ''
     const items = itemList.querySelectorAll('li')
     if (items.length === 0){
         filter.style.display = 'none';
@@ -164,6 +202,10 @@ function checkUI(){
     if (items.length === 1){
         filter.style.display = 'none';
     } 
+    formBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Item'
+    formBtn.style.backgroundColor = '#333'
+
+    isEditMode = false
     }
 
 function filterItems(e){
